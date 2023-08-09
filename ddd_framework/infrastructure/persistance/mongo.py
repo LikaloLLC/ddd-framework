@@ -1,14 +1,21 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from functools import cached_property
 from typing import Any, Mapping, Optional, Sequence, Union
 
 import attrs
-from pymongo import IndexModel, MongoClient
+import pymongo.database
+from pymongo import IndexModel
 from pymongo.collection import Collection
 
 
 @attrs.define
 class Index:
+    """Represent a Mongo index
+
+    :cvar keys: Document fields to add to an index. Mirrors `keys` from :class:`pymongo.collection.IndexModel`
+    :cvar unique: Unique constraint, boolean
+    """
+
     keys: Union[str, Sequence[tuple[str, Union[int, str, Mapping[str, Any]]]]]
     unique: bool = False
 
@@ -16,12 +23,27 @@ class Index:
         return attrs.asdict(self)
 
 
-class MongoRepository(ABC):
+class MongoRepositoryMixin(ABC):
+    """A mixin class that provides with a proxy to a defined Mongo collection.
+
+    It also takes care of indexes, which can be defined as a class attribute.
+
+    :cvar collection_name: A name of a collection to connect to
+    :cvar indexes: A list of indexes to create for the collection.
+                    It syncs indexes every first access to the collection,
+                    meaning that all the old indexes will be deleted and new added.
+    """
+
     collection_name: str = None
     indexes: Optional[list[Index]] = None
 
-    def __init__(self, db_name: str, **kwargs):
-        self._database = MongoClient(**kwargs)[db_name]
+    @abstractmethod
+    def get_database(self) -> pymongo.database.Database:
+        """Return a database instance."""
+
+    @cached_property
+    def _database(self) -> pymongo.database.Database:
+        return self.get_database()
 
     @cached_property
     def _collection(self) -> Collection:
