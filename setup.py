@@ -11,8 +11,8 @@ setup(
     description='The package includes helper methods and types for working in DDD',
     include_package_data=True,
     install_requires=[
-        "cattrs~=22.2.0",
-        "attrs~=22.2.0",
+        "cattrs~=23.1.0",
+        "attrs~=23.1.0",
         "pymongo~=4.3.3",
     ]
 )
