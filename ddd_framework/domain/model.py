@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from abc import ABC
 from datetime import datetime
-from typing import Any, Optional, Protocol, Type, TypeVar, Union
+from typing import Any, Protocol, TypeVar
 
-from attr import define, field, make_class
 import cattrs
+from attr import define, field, make_class
 
 from ddd_framework.utils.types import get_generic_type
 
@@ -16,6 +18,9 @@ class Event:
     time: datetime = field(factory=datetime.now)
 
 
+# endregion
+
+
 # region "Value Object"
 @define(kw_only=True)
 class ValueObject:
@@ -24,27 +29,29 @@ class ValueObject:
 
 # endregion
 
+
 # region "Identity"
 @define(kw_only=False, frozen=True)
 class Id(ValueObject):
     """An identifier"""
 
-    id: Union[str, int]
+    id: str | int
 
     @classmethod
-    def from_raw_id(cls, raw_id: Union[str, int]) -> 'Id':
+    def from_raw_id(cls, raw_id: str | int) -> Id:
         return cls(id=raw_id)
 
 
-def NewId(name: str, base: Id = Id):
+def NewId(name: str, base: type[Id] = Id) -> type[Id]:
     """Create a new identifier's type."""
     return make_class(name, attrs={}, bases=(base,))
 
 
-def structure_id(value: Any, _klass: Type) -> Id:
+def structure_id(value: Any, _klass: type[Id]) -> Id:
     if isinstance(value, dict):
         return _klass(**value)
     return _klass(id=value)
+
 
 cattrs.register_structure_hook(Id, structure_id)
 
@@ -57,10 +64,11 @@ cattrs.register_structure_hook(Id, structure_id)
 class Entity:
     """Represent an entity."""
 
-    id: Optional[Id] = field(default=None)
+    id: Id | None = field(default=None)
 
-    def __hash__(self):
-        return hash(self.id.id)
+    def __hash__(self) -> int:
+        # TODO: Fix "Item "None" of "Id | None" has no attribute "id""
+        return hash(self.id.id)  # type: ignore
 
 
 # endregion
@@ -76,15 +84,15 @@ class Aggregate(ABC, Entity):
 
 
 # region "Repository"
-AggregateType = TypeVar('AggregateType', bound=Aggregate, covariant=True)
+AggregateType_co = TypeVar('AggregateType_co', bound=Aggregate, covariant=True)
 
 
-class IRepository(Protocol[AggregateType]):
+class IRepository(Protocol[AggregateType_co]):
     """A domain interface of an aggregate's repository."""
 
     @property
-    def aggregate_cls(self) -> AggregateType:
-        return get_generic_type(self.__class__)
+    def aggregate_cls(self) -> AggregateType_co:
+        return get_generic_type(self.__class__)  # type: ignore
 
 
 # endregion
