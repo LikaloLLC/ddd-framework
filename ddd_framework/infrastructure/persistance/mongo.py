@@ -1,25 +1,31 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import Any, Mapping, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import attrs
 import pymongo.database
 from pymongo import IndexModel
-from pymongo.collection import Collection
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+    from pymongo.collection import Collection
 
 
 @attrs.define
 class Index:
     """Represent a Mongo index
 
-    :cvar keys: Document fields to add to an index. Mirrors `keys` from :class:`pymongo.collection.IndexModel`
-    :cvar unique: Unique constraint, boolean
+    :var keys: Document fields to add to an index. Mirrors `keys` from :class:`pymongo.collection.IndexModel`
+    :var unique: Unique constraint, boolean
     """
 
-    keys: Union[str, Sequence[tuple[str, Union[int, str, Mapping[str, Any]]]]]
+    keys: str | Sequence[tuple[str, int | str | Mapping[str, Any]]]
     unique: bool = False
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return attrs.asdict(self)
 
 
@@ -34,8 +40,8 @@ class MongoRepositoryMixin(ABC):
                     meaning that all the old indexes will be deleted and new added.
     """
 
-    collection_name: str = None
-    indexes: Optional[list[Index]] = None
+    collection_name: ClassVar[str]
+    indexes: ClassVar[list[Index] | None] = None
 
     @abstractmethod
     def get_database(self) -> pymongo.database.Database:
