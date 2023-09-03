@@ -1,6 +1,6 @@
 [project]
 name = "docsie-ddd-framework"
-version = "0.0.1"
+version = "0.0.2"
 description = "The package includes helper methods and types for working in DDD"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -24,6 +24,9 @@ Repository = "https://github.com/LikaloLLC/ddd-framework.git"
 
 [tool.setuptools.packages]
 find = {}
+
+[tool.setuptools.package-data]
+"ddd_framework" = ["py.typed"]
 
 [tool.mypy]
 strict = true
