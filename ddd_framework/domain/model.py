@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from abc import ABC
 from datetime import datetime
 from typing import Any, Protocol, TypeVar
@@ -44,6 +45,8 @@ class Id(ValueObject):
 
 def NewId(name: str, base: type[Id] = Id) -> type[Id]:
     """Create a new identifier's type."""
+    warnings.warn('Id class will be removed in the next update', DeprecationWarning, stacklevel=2)
+
     return make_class(name, attrs={}, bases=(base,))
 
 
@@ -55,6 +58,8 @@ def structure_id(value: Any, _klass: type[Id]) -> Id:
 
 cattrs.register_structure_hook(Id, structure_id)
 
+EntityId = Any
+
 
 # endregion
 
@@ -64,11 +69,11 @@ cattrs.register_structure_hook(Id, structure_id)
 class Entity:
     """Represent an entity."""
 
-    id: Id | None = field(default=None)
+    id: EntityId | Id | None = field(default=None)
 
     def __hash__(self) -> int:
         # TODO: Fix "Item "None" of "Id | None" has no attribute "id""
-        return hash(self.id.id)  # type: ignore
+        return hash(self.id.id) if isinstance(self.id, Id) else hash(self.id)
 
 
 # endregion
