@@ -1,6 +1,6 @@
 [project]
 name = "docsie-ddd-framework"
-version = "0.0.3"
+version = "0.0.4"
 description = "The package includes helper methods and types for working in DDD"
 readme = "README.md"
 requires-python = ">=3.8"
