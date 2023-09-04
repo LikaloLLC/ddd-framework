@@ -37,6 +37,8 @@ repos:
           - fastapi==0.99
           - dependency_injector==4.41.0
           - langchain==0.0.264
+          - pymongo~=4.3.3
+          - cattrs~=23.1.0
         args: [--install-types, --non-interactive]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit

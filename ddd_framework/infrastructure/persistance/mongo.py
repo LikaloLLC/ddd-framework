@@ -40,20 +40,20 @@ class MongoRepositoryMixin(ABC):
                     meaning that all the old indexes will be deleted and new added.
     """
 
-    collection_name: ClassVar[str]
+    collection_name: str
     indexes: ClassVar[list[Index] | None] = None
 
     @abstractmethod
-    def get_database(self) -> pymongo.database.Database:
+    def get_database(self) -> pymongo.database.Database[dict[str, Any]]:
         """Return a database instance."""
 
     @cached_property
-    def _database(self) -> pymongo.database.Database:
+    def _database(self) -> pymongo.database.Database[dict[str, Any]]:
         return self.get_database()
 
     @cached_property
-    def _collection(self) -> Collection:
-        collection: Collection = self._database[self.collection_name]
+    def _collection(self) -> Collection[dict[str, Any]]:
+        collection: Collection[dict[str, Any]] = self._database[self.collection_name]
         default_indexes = ['_id_']
         skip_indexes: list[Index] = []
         indexes_to_remove: set[str] = set()

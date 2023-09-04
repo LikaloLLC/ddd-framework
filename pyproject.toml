@@ -30,8 +30,6 @@ find = {}
 
 [tool.mypy]
 strict = true
-explicit_package_bases = true
-packages = ["ddd_framework"]
 ignore_missing_imports = true
 exclude = ['ddd_framework/utils/types.py']
 
