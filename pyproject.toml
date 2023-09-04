@@ -1,6 +1,6 @@
 [project]
 name = "docsie-ddd-framework"
-version = "0.0.3"
+version = "0.0.4"
 description = "The package includes helper methods and types for working in DDD"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -30,8 +30,6 @@ find = {}
 
 [tool.mypy]
 strict = true
-explicit_package_bases = true
-packages = ["ddd_framework"]
 ignore_missing_imports = true
 exclude = ['ddd_framework/utils/types.py']
 
